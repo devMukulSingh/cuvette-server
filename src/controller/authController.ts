@@ -34,13 +34,22 @@ export const sendOtpController = async (req: Request, res: Response): Promise<an
         })
 
         if (isUserExists?.isEmailVerified && isUserExists.isPhoneVerified) {
+            const { companyEmail, companyName, employeeSize, id, isEmailVerified, isPhoneVerified, name, phone, } = isUserExists;
             const token = await jwtSign();
             return res.status(200).json({
                 msg: "User already exists",
-                data:{
-                    token
+                data: {
+                    id,
+                    name,
+                    phone,
+                    companyEmail,
+                    companyName,
+                    employeeSize,
+                    isEmailVerified,
+                    isPhoneVerified,
+                    token,
                 },
-                
+
             })
         }
 
@@ -56,12 +65,12 @@ export const sendOtpController = async (req: Request, res: Response): Promise<an
                     companyEmail,
                     phone
                 },
-                    data: {
-                        emailOtp,
-                        phoneOtp,
-                    }
+                data: {
+                    emailOtp,
+                    phoneOtp,
+                }
             })
-            return res.status(201).json({msg:'otp sent',data:{}})
+            return res.status(201).json({ msg: 'otp sent', data: {} })
         }
 
         const newUser = await prisma.user.create({
@@ -75,8 +84,19 @@ export const sendOtpController = async (req: Request, res: Response): Promise<an
                 phoneOtp,
             }
         })
-
-        return res.status(201).json({ msg: 'otp sent',data:{} });
+        const { id, isEmailVerified, isPhoneVerified, } = newUser;
+        return res.status(201).json({
+            msg: 'otp sent', data: {
+                id,
+                isEmailVerified,
+                isPhoneVerified,
+                companyEmail,
+                companyName,
+                employeeSize,
+                name,
+                phone,
+            }
+        });
     }
     catch (e) {
         console.log(`error:"Internal server error in SignupController`, e);
@@ -116,6 +136,7 @@ export const verifyEmailOtpController = async (req: Request, res: Response): Pro
                 isEmailVerified: true
             }
         });
+        const { companyName, employeeSize, id, isEmailVerified, isPhoneVerified, phone, name, } = user
 
         if (user.isPhoneVerified) {
             const token = await jwtSign();
@@ -124,14 +145,19 @@ export const verifyEmailOtpController = async (req: Request, res: Response): Pro
                 secure: true,
                 expires: new Date(Date.now() + (24 * 3600000 * 7))
             }).status(200).json({
-                token,
+                data: {
+                    token,
+                    companyEmail, companyName, employeeSize, id, isEmailVerified, isPhoneVerified, phone, name
+                },
                 msg: "Phone and email verified"
             })
             return response;
         }
 
         return res.status(200).json({
-            msg: "Email Otp verified", data: {}
+            msg: "Email Otp verified", data: {
+                companyEmail, companyName, employeeSize, id, isEmailVerified, isPhoneVerified, phone, name
+            }
         },);
     }
     catch (e) {
@@ -173,6 +199,7 @@ export const verifyPhoneOtpController = async (req: Request, res: Response): Pro
                 isPhoneVerified: true
             }
         });
+        const { companyName, employeeSize, id, isEmailVerified, isPhoneVerified, companyEmail, name, } = user
         if (user.isEmailVerified) {
             const token = await jwtSign();
             const response = res.cookie('token', token, {
@@ -180,7 +207,8 @@ export const verifyPhoneOtpController = async (req: Request, res: Response): Pro
                 secure: true,
                 expires: new Date(Date.now() + (24 * 3600000 * 7))
             }).status(200).json({
-                data:{
+                data: {
+                    companyEmail, companyName, employeeSize, id, isEmailVerified, isPhoneVerified, phone, name,
                     token
                 },
                 msg: "Phone and email verified"
@@ -188,7 +216,7 @@ export const verifyPhoneOtpController = async (req: Request, res: Response): Pro
             return response;
         }
         return res.status(200).json({
-            msg: "Phone Otp verified", data: {}
+            msg: "Phone Otp verified", data: { companyEmail, companyName, employeeSize, id, isEmailVerified, isPhoneVerified, phone, name, }
         });
     }
     catch (e) {
