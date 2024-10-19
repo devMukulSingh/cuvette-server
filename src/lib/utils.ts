@@ -23,7 +23,7 @@ export async function sendEmailOtp(companyEmail:string) {
             html: `<p>Enter the otp ${emailOtp} to verify your email</p>`
         }
         const info = await transporter.sendMail(mailOptions);
-        console.log(`Email otp send`,info);
+        console.log(`Email otp send`);
         
         return emailOtp
     }
@@ -41,7 +41,7 @@ export async function sendPhoneOtp(phone:string) {
             from: process.env.TWILIO_PHONE,
             to: phone,
         });
-        console.log(`Phone otp send`, message);
+        console.log(`Phone otp send`);
         return phoneOtp;
     }
     catch (e) {
