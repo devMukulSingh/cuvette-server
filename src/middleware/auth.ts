@@ -9,7 +9,6 @@ export default async function isAuthenticated(
   try {
     const token = req.headers.authorization;
     let isAuthenticated;
-    console.log(token);
 
     if (!token || token === "") {
       const Response = res.status(403).json({ error: "Unauthenticated" });
