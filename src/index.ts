@@ -13,6 +13,7 @@ app.use(
   cors({
     origin: base_url_client,
     credentials: true,
+    
   }),
 );
 

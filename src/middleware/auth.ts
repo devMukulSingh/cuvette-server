@@ -7,7 +7,7 @@ export default async function isAuthenticated(
   next: NextFunction,
 ): Promise<any> {
   try {
-    const token = req.cookies.token;
+    const token = req.headers.authorization;
     let isAuthenticated;
     console.log(token);
 

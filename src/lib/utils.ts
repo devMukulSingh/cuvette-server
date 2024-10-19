@@ -2,7 +2,9 @@ import nodemailer from "nodemailer";
 import twilio from "twilio";
 
 export const base_url_client =
-  process.env.NODE_ENV === "production" ? "https://cuvette-client.vercel.app" : "http://localhost:5173";
+  process.env.NODE_ENV === "production"
+    ? "https://cuvette-client.vercel.app"
+    : "http://localhost:5173";
 
 export async function sendEmailOtp(companyEmail: string) {
   try {
