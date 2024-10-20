@@ -306,3 +306,69 @@ export const verifyPhoneOtpController = async (
     });
   }
 };
+
+export const sendEmailOtpController = async (
+  req: Request,
+  res: Response,
+): Promise<any> => {
+  try {
+    const { companyEmail } = req.body;
+
+    if (!companyEmail)
+      return res.status(400).json({
+        error: "companyEmail is required",
+      });
+
+    const isUserExists = await prisma.user.findFirst({
+      where: {
+        companyEmail,
+      },
+    });
+    if (!isUserExists?.isEmailVerified || !isUserExists.isPhoneVerified)
+      return res.status(400).json({
+        error: "User doesn't exists",
+      });
+
+    const emailOtp = await sendEmailOtp(companyEmail);
+
+    if (!emailOtp) return res.status(500).json({ error: "Email otp not send" });
+
+    await prisma.user.update({
+      where: {
+        companyEmail,
+      },
+      data: {
+        emailOtp,
+      },
+    });
+
+    const {
+      companyName,
+      employeeSize,
+      id,
+      isEmailVerified,
+      isPhoneVerified,
+      name,
+      phone,
+    } = isUserExists;
+
+    return res.status(200).json({
+      msg: "otp sent",
+      data: {
+        companyName,
+        employeeSize,
+        companyEmail,
+        id,
+        isEmailVerified,
+        isPhoneVerified,
+        name,
+        phone,
+      },
+    });
+  } catch (e) {
+    console.log(`error:"Internal server error in sendEmailOtpController`, e);
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+};

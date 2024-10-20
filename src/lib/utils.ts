@@ -16,8 +16,11 @@ export async function sendEmailOtp(companyEmail: string) {
         pass: process.env.SMTP_PASS,
       },
     });
-    const emailOtp = Math.floor(Math.random() * 10000);
-    console.log(emailOtp);
+    let emailOtp = Math.floor(Math.random() * 10000);
+    while (emailOtp.toString().length !== 4) {
+      emailOtp = Math.floor(Math.random() * 10000);
+      console.log(emailOtp);
+    }
     const mailOptions = {
       from: "mukulsingh2276@gmail.com",
       to: companyEmail,
@@ -35,7 +38,11 @@ export async function sendEmailOtp(companyEmail: string) {
 
 export async function sendPhoneOtp(phone: string) {
   try {
-    const phoneOtp = Math.floor(Math.random() * 10000);
+    let phoneOtp = Math.floor(Math.random() * 10000);
+    while (phoneOtp.toString().length !== 4) {
+      phoneOtp = Math.floor(Math.random() * 10000);
+      console.log(phoneOtp);
+    }
     const client = twilio(
       process.env.TWILIO_SSID,
       process.env.TWILIO_AUTH_TOKEN,

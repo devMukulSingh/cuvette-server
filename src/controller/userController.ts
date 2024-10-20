@@ -62,3 +62,33 @@ export const postJobController = async (
     });
   }
 };
+
+export const getJobsController = async (
+  req: Request,
+  res: Response,
+): Promise<any> => {
+  try {
+    const { id } = req.query;
+
+    if (!id)
+      return res.status(400).json({
+        error: "id is required",
+      });
+
+    const jobs = await prisma.job.findMany({
+      where: {
+        userId: id.toString(),
+      },
+    });
+
+    return res.status(200).json({
+      msg: "job fetched",
+      data: jobs,
+    });
+  } catch (e) {
+    console.log(`Internal server error in getJobsController ${e}`);
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+};
