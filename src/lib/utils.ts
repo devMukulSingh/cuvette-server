@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
 import twilio from "twilio";
 
 export const base_url_client =
@@ -56,5 +57,30 @@ export async function sendPhoneOtp(phone: string) {
     return phoneOtp;
   } catch (e) {
     console.log(`Error in sendPhoneOtp`, e);
+  }
+}
+
+
+export async function sendMultipleMails({ candidatesEmail, subject, message }: { candidatesEmail: string, subject: string, message: string }) {
+  try {
+    const transporter = nodemailer.createTransport({
+      host: "smtp-relay.brevo.com",
+      port: 587,
+      auth: {
+        user: "mukulsingh2276@gmail.com",
+        pass: process.env.SMTP_PASS,
+      },
+    });
+    const mailOptions = {
+      from: "mukulsingh2276@gmail.com",
+      to: candidatesEmail,
+      subject,
+      html: message,
+    };
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`Email otp send`);
+    return info;
+  } catch (e:any) {
+    console.log(`Error in sendEmailOtp `, e);
   }
 }

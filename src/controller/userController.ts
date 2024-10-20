@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
+import { sendMultipleMails } from "../lib/utils";
+import {format} from "date-fns"
 
 export const postJobController = async (
   req: Request,
@@ -92,3 +94,55 @@ export const getJobsController = async (
     });
   }
 };
+
+
+
+export const sendMailsController = async(req: Request, res: Response): Promise<any> => {
+  try {
+    const { candidatesEmail,job } = req.body;
+    if(!candidatesEmail) return res.status(400).json({
+      error:"candidates email is required"
+    })
+    if (!job) return res.status(400).json({
+      error: "job is required"
+    });
+
+    const user = await prisma.user.findFirst({
+      where:{
+        Jobs:{
+          some:{
+            id:job.id
+          }
+        }
+      }
+    })
+
+    const subject = `Job opening at ${user?.companyName}`
+    const message = 
+    `<p>Hello, there is a new job posting for ${job.jobTitle} in our company ${user?.companyName}</p><br/>
+      Here is the job description ${job.jobDescription}<br/>
+      Please apply before ${format(job.endDate,'dd/MM/yyyy')}
+    `;
+
+    const mailInfo =  await sendMultipleMails({
+      candidatesEmail,
+      message,
+      subject
+    })
+
+    if(!mailInfo) return res.status(400).json({
+      error:'Mail not send'
+    })
+
+    return res.status(200).json({
+      msg:'Emails send',
+      data:{subject,message},
+    })
+  }
+  catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      error: 'Internal server error'
+    })
+  }
+}

@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   getJobsController,
   postJobController,
+  sendMailsController,
 } from "../controller/userController";
 import isAuthenticated from "../middleware/auth";
 
@@ -11,5 +12,7 @@ userRouter.use(isAuthenticated);
 
 userRouter.post(`/post-job`, postJobController);
 userRouter.get(`/get-jobs`, getJobsController);
+userRouter.post(`/send-mails`, sendMailsController);
+
 
 export default userRouter;
